@@ -9,9 +9,12 @@ const products = [
 
 // DOM elements
 const productList = document.getElementById("product-list");
+const cartList = document.getElementById("cart-list");
+const clearCartBtn = document.getElementById("clear-cart-btn");
 
-// Render product list
+// Function to render the product list
 function renderProducts() {
+  productList.innerHTML = ""; // Clear any existing product list
   products.forEach((product) => {
     const li = document.createElement("li");
     li.innerHTML = `${product.name} - $${product.price} <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>`;
@@ -19,8 +22,7 @@ function renderProducts() {
   });
 
   // Add event listeners for "Add to Cart" buttons
-  const addToCartButtons = document.querySelectorAll(".add-to-cart-btn");
-  addToCartButtons.forEach((button) => {
+  document.querySelectorAll(".add-to-cart-btn").forEach((button) => {
     button.addEventListener("click", () => {
       const productId = parseInt(button.getAttribute("data-id"));
       addToCart(productId);
@@ -28,64 +30,58 @@ function renderProducts() {
   });
 }
 
-// Render cart list
+// Function to render the cart list
 function renderCart() {
-  const cartList = document.getElementById("cart-list");
-  cartList.innerHTML = ""; // Clear current cart display
+  cartList.innerHTML = ""; // Clear any existing cart list
   const cart = JSON.parse(sessionStorage.getItem("cart")) || [];
 
-  cart.forEach((item) => {
+  cart.forEach((item, index) => {
     const li = document.createElement("li");
-    li.innerHTML = `${item.name} - $${item.price} <button class="remove-from-cart-btn" data-id="${item.id}">Remove</button>`;
+    li.innerHTML = `${item.name} - $${item.price} <button class="remove-from-cart-btn" data-index="${index}">Remove</button>`;
     cartList.appendChild(li);
   });
 
-  // Add event listeners for "Remove" buttons
-  const removeButtons = document.querySelectorAll(".remove-from-cart-btn");
-  removeButtons.forEach((button) => {
+  // Add event listeners for "Remove from Cart" buttons
+  document.querySelectorAll(".remove-from-cart-btn").forEach((button) => {
     button.addEventListener("click", () => {
-      const productId = parseInt(button.getAttribute("data-id"));
-      removeFromCart(productId);
+      const index = parseInt(button.getAttribute("data-index"));
+      removeFromCart(index);
     });
   });
 }
 
-// Add item to cart
+// Function to add a product to the cart
 function addToCart(productId) {
   const cart = JSON.parse(sessionStorage.getItem("cart")) || [];
   const product = products.find((p) => p.id === productId);
 
   if (product) {
-    cart.push(product); // Add product to cart
+    cart.push(product); // Add the product to the cart
     sessionStorage.setItem("cart", JSON.stringify(cart)); // Update session storage
     renderCart(); // Update the cart display
   }
 }
 
-// Remove item from cart
-function removeFromCart(productId) {
-  let cart = JSON.parse(sessionStorage.getItem("cart")) || [];
-  cart = cart.filter((item) => item.id !== productId); // Remove selected product
-
+// Function to remove a product from the cart by index
+function removeFromCart(index) {
+  const cart = JSON.parse(sessionStorage.getItem("cart")) || [];
+  cart.splice(index, 1); // Remove the product at the specified index
   sessionStorage.setItem("cart", JSON.stringify(cart)); // Update session storage
   renderCart(); // Update the cart display
 }
 
-// Clear cart
+// Function to clear the entire cart
 function clearCart() {
-  sessionStorage.removeItem("cart"); // Clear session storage
-  renderCart(); // Clear the cart display
+  sessionStorage.removeItem("cart"); // Clear cart data from session storage
+  renderCart(); // Update the cart display
 }
 
-// Add event listener to "Clear Cart" button
-function setupClearCartListener() {
-  const clearCartButton = document.getElementById("clear-cart-btn");
-  clearCartButton.addEventListener("click", clearCart);
-}
+// Add event listener for "Clear Cart" button
+clearCartBtn.addEventListener("click", clearCart);
 
-// Initial render
-renderProducts();
-renderCart();
-setupClearCartListener();
+// Initial rendering
+renderProducts(); // Display the product list
+renderCart(); // Display the cart if it has existing items
+
 
 
