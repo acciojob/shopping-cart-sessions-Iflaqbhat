@@ -17,6 +17,15 @@ function renderProducts() {
     li.innerHTML = `${product.name} - $${product.price} <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>`;
     productList.appendChild(li);
   });
+
+  // Add event listeners to all "Add to Cart" buttons
+  const addToCartButtons = document.querySelectorAll(".add-to-cart-btn");
+  addToCartButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const productId = parseInt(button.getAttribute("data-id"));
+      addToCart(productId);
+    });
+  });
 }
 
 // Render cart list
@@ -30,6 +39,15 @@ function renderCart() {
     li.innerHTML = `${item.name} - $${item.price} <button class="remove-from-cart-btn" data-id="${item.id}">Remove</button>`;
     cartList.appendChild(li);
   });
+
+  // Add event listeners to all "Remove" buttons
+  const removeButtons = document.querySelectorAll(".remove-from-cart-btn");
+  removeButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const productId = parseInt(button.getAttribute("data-id"));
+      removeFromCart(productId);
+    });
+  });
 }
 
 // Add item to cart
@@ -38,9 +56,9 @@ function addToCart(productId) {
   const product = products.find((p) => p.id === productId);
 
   if (product) {
-    cart.push(product);
-    sessionStorage.setItem("cart", JSON.stringify(cart));
-    renderCart();
+    cart.push(product); // Add the product to the cart array
+    sessionStorage.setItem("cart", JSON.stringify(cart)); // Update session storage
+    renderCart(); // Re-render the cart
   }
 }
 
@@ -59,22 +77,14 @@ function clearCart() {
   renderCart();
 }
 
-// Event listeners
-document.body.addEventListener("click", (e) => {
-  if (e.target.classList.contains("add-to-cart-btn")) {
-    const productId = parseInt(e.target.getAttribute("data-id"));
-    addToCart(productId);
-  }
-
-  if (e.target.classList.contains("remove-from-cart-btn")) {
-    const productId = parseInt(e.target.getAttribute("data-id"));
-    removeFromCart(productId);
-  }
-});
-
-document.getElementById("clear-cart-btn").addEventListener("click", clearCart);
+// Add event listener to the "Clear Cart" button
+function setupClearCartListener() {
+  const clearCartButton = document.getElementById("clear-cart-btn");
+  clearCartButton.addEventListener("click", clearCart);
+}
 
 // Initial render
 renderProducts();
 renderCart();
+setupClearCartListener();
 
