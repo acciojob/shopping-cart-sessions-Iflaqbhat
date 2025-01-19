@@ -14,10 +14,13 @@ const clearCartBtn = document.getElementById("clear-cart-btn");
 
 // Function to render the product list
 function renderProducts() {
-  productList.innerHTML = ""; // Clear any existing product list
+  productList.innerHTML = products.length
+    ? ""
+    : "<li>No products available</li>"; // Show message if no products
   products.forEach((product) => {
     const li = document.createElement("li");
-    li.innerHTML = `${product.name} - $${product.price} <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>`;
+    li.innerHTML = `${product.name} - $${product.price} 
+      <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>`;
     productList.appendChild(li);
   });
 
@@ -32,12 +35,15 @@ function renderProducts() {
 
 // Function to render the cart list
 function renderCart() {
-  cartList.innerHTML = ""; // Clear any existing cart list
   const cart = JSON.parse(sessionStorage.getItem("cart")) || [];
+  cartList.innerHTML = cart.length
+    ? ""
+    : "<li>No items in the cart</li>"; // Show message if cart is empty
 
   cart.forEach((item, index) => {
     const li = document.createElement("li");
-    li.innerHTML = `${item.name} - $${item.price} <button class="remove-from-cart-btn" data-index="${index}">Remove</button>`;
+    li.innerHTML = `${item.name} - $${item.price} 
+      <button class="remove-from-cart-btn" data-index="${index}">Remove</button>`;
     cartList.appendChild(li);
   });
 
@@ -55,10 +61,12 @@ function addToCart(productId) {
   const cart = JSON.parse(sessionStorage.getItem("cart")) || [];
   const product = products.find((p) => p.id === productId);
 
-  if (product) {
-    cart.push(product); // Add the product to the cart
+  if (product && !cart.some((item) => item.id === productId)) {
+    cart.push(product); // Add the product if not already in the cart
     sessionStorage.setItem("cart", JSON.stringify(cart)); // Update session storage
     renderCart(); // Update the cart display
+  } else {
+    alert("Product already in the cart!"); // Feedback for duplicate addition
   }
 }
 
@@ -77,11 +85,12 @@ function clearCart() {
 }
 
 // Add event listener for "Clear Cart" button
-clearCartBtn.addEventListener("click", clearCart);
+clearCartBtn.addEventListener("click", () => {
+  if (confirm("Are you sure you want to clear the cart?")) {
+    clearCart();
+  }
+});
 
 // Initial rendering
 renderProducts(); // Display the product list
 renderCart(); // Display the cart if it has existing items
-
-
-
