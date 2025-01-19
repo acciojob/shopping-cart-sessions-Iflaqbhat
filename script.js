@@ -9,8 +9,10 @@ const products = [
 
 // Clear the cart and render it as empty on page load
 window.onload = () => {
-  sessionStorage.setItem("cart", JSON.stringify([])); // Clear session storage for cart
-  renderCart(); // Ensure the cart starts empty
+  if (!sessionStorage.getItem("cart")) {
+    sessionStorage.setItem("cart", JSON.stringify([])); // Initialize cart in session storage
+  }
+  renderCart(); // Render the initial cart state
 };
 
 // Function to render the cart items in the DOM
